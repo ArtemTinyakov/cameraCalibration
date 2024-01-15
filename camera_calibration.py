@@ -84,7 +84,16 @@ def main(page: ft.Page):
 
         if dst is not None:
             ax[1].clear()
-            ax[1].imshow(dst[int(slider_roi_y.value):int(slider_roi_w.max - slider_roi_w.value), int(slider_roi_x.value):int(slider_roi_z.max - slider_roi_z.value), :])
+            ax[1].imshow(dst)
+            ax[1].plot([slider_roi_x.value, slider_roi_x.value],
+                       [slider_roi_y.value, slider_roi_w.max - slider_roi_w.value], color='red', linewidth=1)
+            ax[1].plot([slider_roi_z.max - slider_roi_z.value, slider_roi_z.max - slider_roi_z.value],
+                       [slider_roi_y.value, slider_roi_w.max - slider_roi_w.value], color='red', linewidth=1)
+            ax[1].plot([slider_roi_x.value, slider_roi_z.max - slider_roi_z.value],
+                       [slider_roi_y.value, slider_roi_y.value], color='red', linewidth=1)
+            ax[1].plot([slider_roi_x.value, slider_roi_z.max - slider_roi_z.value],
+                       [slider_roi_w.max - slider_roi_w.value,slider_roi_w.max - slider_roi_w.value], color='red', linewidth=1)
+            #ax[1].imshow(dst[int(slider_roi_y.value):int(slider_roi_w.max - slider_roi_w.value), int(slider_roi_x.value):int(slider_roi_z.max - slider_roi_z.value), :])
             page.update()
 
     def get_video(e: ft.FilePickerResultEvent):
