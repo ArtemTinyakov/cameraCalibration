@@ -77,7 +77,7 @@ def main(page: ft.Page):
                 fout.write(f"{int(slider_roi_x.value)} ")                     # roi x
                 fout.write(f"{int(slider_roi_y.value)} ")                     # roi y
                 fout.write(f"{int(dst.shape[1] - slider_roi_z.value - 1)} ")  # roi z
-                fout.write(f"{int(dst.shape[0] - slider_roi_w.value - 1)} ")  # roi w
+                fout.write(f"{int(dst.shape[0] - slider_roi_w.value - 1)}")   # roi w
 
     def flip180(e):
         nonlocal dst, ax, flipped
