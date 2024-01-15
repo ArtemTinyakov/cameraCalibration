@@ -61,29 +61,23 @@ def main(page: ft.Page):
         ax[0].imshow(img)
         page.update()
 
-    def save_matrix(e):
-        nonlocal pts1, pts2, flipped
+    def save_data(e):
+        nonlocal slider_roi_x, slider_roi_y, slider_roi_z, slider_roi_w, pts1, pts2, flipped
 
-        if pts1 is not None and pts2 is not None:
+        if pts1 is not None and pts2 is not None and dst is not None:
             pts2_ = copy.deepcopy(pts2)
             if flipped:
                 pts2_ = np.array([pts2[2], pts2[3], pts2[0], pts2[1]])
             M = cv.getPerspectiveTransform(pts1, pts2_)
-            with open("calibration_matrix.txt", 'w', newline='') as fout:
+            with open("calibration.txt", 'w', newline='') as fout:
                 for row in M:
                     for val in row:
                         fout.write(f'{val:.12f} ')
                     fout.write('\n')
-
-    def save_roi(e):
-        nonlocal slider_roi_x, slider_roi_y, slider_roi_z, slider_roi_w
-
-        if dst is not None:
-            with open("roi.txt", 'w', newline='\n') as fout:
-                fout.write(f"roi_x = {int(slider_roi_x.value)}\n")
-                fout.write(f"roi_y = {int(slider_roi_y.value)}\n")
-                fout.write(f"roi_z = {int(dst.shape[1] - slider_roi_z.value)}\n")
-                fout.write(f"roi_w = {int(dst.shape[0] - slider_roi_w.value)}\n")
+                fout.write(f"{int(slider_roi_x.value)}\n")                     # roi x
+                fout.write(f"{int(slider_roi_y.value)}\n")                     # roi y
+                fout.write(f"{int(dst.shape[1] - slider_roi_z.value - 1)}\n")  # roi z
+                fout.write(f"{int(dst.shape[0] - slider_roi_w.value - 1)}\n")  # roi w
 
     def flip180(e):
         nonlocal dst, ax, flipped
@@ -248,10 +242,6 @@ def main(page: ft.Page):
                                 ),
                             ]
                         ),
-                        ft.ElevatedButton(
-                            "save matrix",
-                            on_click=save_matrix,
-                        ),
                         ft.Row(
                             [
                                 ft.Column(
@@ -289,8 +279,8 @@ def main(page: ft.Page):
                             ]
                         ),
                         ft.ElevatedButton(
-                            "save roi",
-                            on_click=save_roi,
+                            "save data",
+                            on_click=save_data,
                         )
                     ],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
