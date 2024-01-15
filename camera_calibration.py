@@ -20,6 +20,7 @@ def is_number(page, flet_container):
 def main(page: ft.Page):
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
     m, n, cap, ret, img, dst, objp, chart = None, None, None, None, None, None, None, ft.Container()
+    flipped = False
     pts1, pts2 = None, None
     imgpoints = []  # 2d points in image plane.
     fig, ax = plt.subplots(1, 2)
@@ -61,8 +62,13 @@ def main(page: ft.Page):
         page.update()
 
     def save_matrix(e):
+        nonlocal pts1, pts2, flipped
+
         if pts1 is not None and pts2 is not None:
-            M = cv.getPerspectiveTransform(pts1, pts2)
+            pts2_ = copy.deepcopy(pts2)
+            if flipped:
+                pts2_ = np.array([pts2[2], pts2[3], pts2[0], pts2[1]])
+            M = cv.getPerspectiveTransform(pts1, pts2_)
             with open("calibration_matrix.txt", 'w', newline='') as fout:
                 for row in M:
                     for val in row:
@@ -78,6 +84,16 @@ def main(page: ft.Page):
                 fout.write(f"roi_y = {int(slider_roi_y.value)}\n")
                 fout.write(f"roi_z = {int(dst.shape[1] - slider_roi_z.value)}\n")
                 fout.write(f"roi_w = {int(dst.shape[0] - slider_roi_w.value)}\n")
+
+    def flip180(e):
+        nonlocal dst, ax, flipped
+
+        if dst is not None:
+            cv.flip(dst, 0, dst)
+            ax[1].clear()
+            ax[1].imshow(dst)
+            flipped = not flipped
+            page.update()
 
     def slider_changed(e):
         nonlocal slider_roi_x, slider_roi_y, slider_roi_z, slider_roi_w
@@ -220,9 +236,17 @@ def main(page: ft.Page):
                                 columns,
                             ]
                         ),
-                        ft.ElevatedButton(
-                            "next frame",
-                            on_click=next_frame,
+                        ft.Row(
+                            [
+                                ft.ElevatedButton(
+                                    "next frame",
+                                    on_click=next_frame,
+                                ),
+                                ft.ElevatedButton(
+                                    "flip",
+                                    on_click=flip180,
+                                ),
+                            ]
                         ),
                         ft.ElevatedButton(
                             "save matrix",
